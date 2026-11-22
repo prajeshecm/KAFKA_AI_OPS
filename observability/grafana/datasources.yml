@@ -1,0 +1,7 @@
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy                 # Grafana's server calls Prometheus, not your browser
+    url: http://prometheus:9090   # container name: both run inside Docker
+    isDefault: true

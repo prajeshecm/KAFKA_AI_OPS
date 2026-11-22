@@ -1,0 +1,12 @@
+route:
+  receiver: webhook
+  group_by: [alertname, consumergroup]   # one notification per alert + group
+  group_wait: 10s        # wait briefly to batch related alerts
+  repeat_interval: 1h    # re-send if still firing after an hour
+
+receivers:
+  - name: webhook
+    webhook_configs:
+      # A dummy receiver for now; later this becomes our FastAPI app
+      - url: http://webhook-echo:8080/alerts
+        send_resolved: true   # also tell us when the alert clears

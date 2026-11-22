@@ -1,0 +1,13 @@
+groups:
+  - name: kafka-lag
+    rules:
+      - alert: ConsumerLagHigh
+        # Total lag for our real consumer group (ignore the demo group)
+        expr: sum by (consumergroup) (kafka_consumergroup_lag{consumergroup="orders-consumer"}) > 100
+        # Must stay true for 2 minutes before firing: ignores normal bursts
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Consumer group {{ $labels.consumergroup }} is lagging"
+          description: "Total lag is {{ $value }} messages"

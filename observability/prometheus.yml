@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s          # pull every 15 seconds
+
+scrape_configs:
+  # Consumer lag, per group and partition
+  - job_name: kafka-exporter
+    static_configs:
+      - targets: ["kafka-exporter:9308"]
+
+  # Spring apps run on your laptop, not in Docker,
+  # so Prometheus reaches them through host.docker.internal
+  - job_name: spring-apps
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8081", "host.docker.internal:8082"]
+
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
