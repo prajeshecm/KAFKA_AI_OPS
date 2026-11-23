@@ -1,5 +1,6 @@
 package dev.copilot.producer;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -7,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final KafkaTemplate<String, String> kafka;
+
+        @Value("${app.topic}")
+    private String topic;
+    // ...and in send(): kafka.send(topic, orderId, ...)
 
     // Spring injects the KafkaTemplate it built from application.properties
     public OrderController(KafkaTemplate<String, String> kafka) {
@@ -19,7 +24,7 @@ public class OrderController {
         for (int i = 1; i <= count; i++) {
             String orderId = "order-" + i;
             // key = orderId, so one order's messages stay in one partition
-            kafka.send("orders", orderId, "{\"orderId\":\"" + orderId + "\",\"amount\":50}");
+            kafka.send(topic, orderId, "{\"orderId\":\"" + orderId + "\",\"amount\":50}");
         }
         return "Sent " + count + " orders";
     }

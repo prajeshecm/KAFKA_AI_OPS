@@ -17,7 +17,7 @@ public class OrderListener {
     private long processingDelayMs;
 
     // Spring polls Kafka and calls this method once per record
-    @KafkaListener(topics = "orders")
+    @KafkaListener(topics = "${app.topic}")
     public void onOrder(ConsumerRecord<String, String> record) throws InterruptedException {
         // Simulate real work, like a database call
         Thread.sleep(processingDelayMs);
