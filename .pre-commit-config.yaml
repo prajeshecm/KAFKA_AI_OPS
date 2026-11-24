@@ -1,0 +1,68 @@
+
+repos:
+  # General hygiene checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: detect-private-key
+      - id: check-json
+
+  # YAML style and syntax
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed]
+
+  # Dockerfile best practices
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+
+  # Our own local checks
+  - repo: local
+    hooks:
+      - id: compose-config
+        name: docker compose config
+        language: system
+        entry: docker compose config -q
+        files: ^docker-compose\.yml$
+        pass_filenames: false
+
+      - id: promtool
+        name: promtool check config and rules
+        language: system
+        entry: bash -c 'docker run --rm -v "$PWD/observability:/etc/prometheus" --entrypoint promtool prom/prometheus:v2.53.0 check config /etc/prometheus/prometheus.yml'
+        files: ^observability/(prometheus|alert-rules)\.yml$
+        pass_filenames: false
+
+      - id: amtool
+        name: amtool check-config
+        language: system
+        entry: bash -c 'docker run --rm -v "$PWD/observability:/etc/alertmanager" --entrypoint amtool prom/alertmanager:v0.27.0 check-config /etc/alertmanager/alertmanager.yml'
+        files: ^observability/alertmanager\.yml$
+        pass_filenames: false
+
+  # Bash linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
+  # Secret scanning
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+
+  # Java formatting
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.14.0
+    hooks:
+      - id: pretty-format-java
+        args: [--autofix]
