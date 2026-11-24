@@ -24,14 +24,12 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
-
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       # Fixed cluster ID, so restarted containers match the stored data
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-    
     volumes:
       - kafka-data:/var/lib/kafka/data
-    
+
   consumer:
     build: ./platform/apps/consumer
     container_name: consumer
@@ -41,11 +39,12 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       # The JVM reads this automatically: heap may use 75% of the container limit
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"   # fault:consumer-heap
+    # memswap_limit equal to mem_limit means no swap
     mem_limit: 512m        # fault:consumer-mem
-    memswap_limit: 512m    # fault:consumer-mem  (equal to mem_limit = no swap)
+    memswap_limit: 512m    # fault:consumer-mem
     restart: unless-stopped
     depends_on: [kafka]
-    
+
   kafka-exporter:
     image: danielqsj/kafka-exporter:v1.8.0
     command: ["--kafka.server=kafka:29092"]   # INTERNAL listener: container to container
@@ -80,4 +79,4 @@ services:
       HTTP_PORT: 8080
 
 volumes:
-    kafka-data:
+  kafka-data:
