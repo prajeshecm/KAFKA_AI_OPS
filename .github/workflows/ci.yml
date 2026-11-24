@@ -4,31 +4,47 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:      # manual "Run workflow" button
+
+# Least privilege: the workflow can only read the repo
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older run
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # Same checks as pre-commit, so nothing can skip them
   lint:
+    name: Pre-commit checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - uses: pre-commit/action@v3.0.1   # installs and runs every hook
-
-  # Build and test both Spring apps
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        app: [producer, consumer]        # runs the job once per app, in parallel
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      # Pin Java 21: the runner default is newer and breaks the formatter
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
-          cache: maven                   # reuse downloaded dependencies between runs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: pre-commit/action@v3.0.1
+
+  test:
+    name: Maven verify (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false    # one app failing doesn't cancel the other
+      matrix:
+        app: [producer, consumer]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
       - name: Maven verify
         working-directory: platform/apps/${{ matrix.app }}
         run: ./mvnw -B verify
