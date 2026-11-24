@@ -32,6 +32,20 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
     
+  consumer:
+    build: ./platform/apps/consumer
+    container_name: consumer
+    ports: ["8082:8082"]
+    environment:
+      # Inside Docker, use the INTERNAL listener, not localhost:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      # The JVM reads this automatically: heap may use 75% of the container limit
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"   # fault:consumer-heap
+    mem_limit: 512m        # fault:consumer-mem
+    memswap_limit: 512m    # fault:consumer-mem  (equal to mem_limit = no swap)
+    restart: unless-stopped
+    depends_on: [kafka]
+    
   kafka-exporter:
     image: danielqsj/kafka-exporter:v1.8.0
     command: ["--kafka.server=kafka:29092"]   # INTERNAL listener: container to container
