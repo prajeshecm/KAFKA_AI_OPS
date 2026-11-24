@@ -10,4 +10,4 @@ Evidence:
 
 Fix: raise app.topic-partitions (e.g. 1 -> 3); KafkaAdmin adds partitions on restart.
 Caveat: adding partitions changes which partition each key maps to, so ordering
-for keys in flight can break briefly. Partitions can never be removed.
+for keys in flight can break briefly. Partitions can never be removed.....
