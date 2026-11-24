@@ -20,7 +20,7 @@ jobs:
     name: Pre-commit checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Pin Java 21: the runner default is newer and breaks the formatter
       - uses: actions/setup-java@v5
         with:
@@ -39,7 +39,7 @@ jobs:
       matrix:
         app: [producer, consumer]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
