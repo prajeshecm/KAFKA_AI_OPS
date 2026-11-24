@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Spring Boot and Kafka client libraries in each app
+  - package-ecosystem: maven
+    directory: /platform/apps/producer
+    schedule:
+      interval: weekly
+  - package-ecosystem: maven
+    directory: /platform/apps/consumer
+    schedule:
+      interval: weekly
+
+  # Base images in the consumer Dockerfile (eclipse-temurin)
+  - package-ecosystem: docker
+    directory: /platform/apps/consumer
+    schedule:
+      interval: weekly
+
+  # Versions of the actions used in ci.yml (checkout, setup-java...)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
