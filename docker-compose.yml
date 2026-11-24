@@ -38,10 +38,10 @@ services:
       # Inside Docker, use the INTERNAL listener, not localhost:9092
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       # The JVM reads this automatically: heap may use 75% of the container limit
-      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"   # fault:consumer-heap
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=90 -XX:InitialRAMPercentage=90 -XX:+AlwaysPreTouch"   # fault:consumer-heap
     # memswap_limit equal to mem_limit means no swap
-    mem_limit: 512m        # fault:consumer-mem
-    memswap_limit: 512m    # fault:consumer-mem
+    mem_limit: 160m        # fault:consumer-mem
+    memswap_limit: 160m    # fault:consumer-mem
     restart: unless-stopped
     depends_on: [kafka]
 
